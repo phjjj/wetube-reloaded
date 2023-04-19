@@ -1,8 +1,9 @@
-extends base.pug
-
-
+extends base
+include mixins/video
 
 block content
-    h1 home
-    input(placeholer="fdsfs")
-    button send
+  h2 Welcome
+  each potato in videos 
+    +video(potato)
+  else
+    li not found
