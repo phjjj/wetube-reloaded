@@ -1,24 +1,32 @@
 import Video from "../models/Video";
-
+import User from "../models/User"
 export const home = async (req, res) => {
   const videos = await Video.find({}).sort({ createdAt: "desc" });
   return res.render("home", { pageTitle: "Home", videos });
 };
 
 export const watch = async (req, res) => {
-  const { id } = req.params;
-  const video = await Video.findById(id);
-  if (!video) {
-    return res.render("404", { pageTitle: "Video not found." });
-  }
-  return res.render("watch", { pageTitle: video.title, video });
+    const { id } = req.params;
+    const video = await Video.findById(id).populate("owner");
+    // populate() 뜻 채우다, 덧붙이다
+    // populate()를 사용해서 mongoose는 owner가 objectId인 것을 owner의 id로 알고 User를 찾아서 정보를 보여줌
+
+    if (!video) {
+        return res.render("404", { pageTitle: "Video not found." });
+    }
+    return res.render("watch", { pageTitle: video.title, video });
 };
 
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {user:{_id},} = req.session;
   const video = await Video.findById(id);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+// 유저 정보와 비디오의 주인 비교하는데 하나는 object형식,하나는 string이라서 둘다 String을 붙여준다
+  if (String(video.owner) !== String(_id)) {
+      return res.status(403).redirect("/");
   }
   return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
 };
@@ -43,13 +51,20 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+  const {user:{_id}} = req.session;
+  const {path:fileUrl} = req.file
   const { title, description, hashtags } = req.body;
   try {
-    await Video.create({
+    const newVideo = await Video.create({
       title,
+      fileUrl,
       description,
+      owner:_id,
       hashtags: Video.formatHashtags(hashtags),
     });
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
     return res.status(400).render("upload", {

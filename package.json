@@ -7,7 +7,8 @@
     "url": "git+https://github.com/nomadcoders/wetube-reloaded.git"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node src/init.js"
+    "dev": "nodemon --exec babel-node src/init.js",
+    "assets" : "webpack --config webpack.config.js"
   },
   "author": "Nicolas Serrano <nico@nomadcoders.co>",
   "license": "MIT",
@@ -16,12 +17,21 @@
   },
   "homepage": "https://github.com/nomadcoders/wetube-reloaded#readme",
   "dependencies": {
+    "-": "^0.0.1",
     "bcrypt": "^5.1.0",
+    "connect-mongo": "^5.0.0",
+    "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "express-session": "^1.17.3",
     "mongoose": "^7.1.0",
+    "mongoose-session": "^0.0.4",
     "morgan": "^1.10.0",
-    "pug": "^3.0.2"
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.6.1",
+    "pug": "^3.0.2",
+    "save-dev": "^0.0.1-security",
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
